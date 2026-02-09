@@ -152,3 +152,195 @@ line2
         new_content = "a\nb\nc"
         result = _replace_section(readme, "claude-stats", new_content)
         assert "a\nb\nc" in result
+
+
+class TestRenderStatsDetailedOutput:
+    """Test that rendered output contains correct data and formatting."""
+
+    def test_detail_table_has_correct_columns(self):
+        """Verify the detail table has all required columns in correct order."""
+        repos = [
+            RepoFeatures(name="test-repo", has_claude_md=True),
+        ]
+        stats = OrgStats.aggregate("test-org", repos)
+        config = _make_config(show_sections=["details"])
+        result = render_stats(stats, config)
+
+        # Check header row
+        assert "| Repo | CLAUDE.md | .claude/ | MCP | Commands | Actions | Hooks | Agents | Memory |" in result
+
+    def test_detail_table_only_shows_repos_with_features(self):
+        """Repos with no features should not appear in detail table."""
+        repos = [
+            RepoFeatures(name="active-repo", has_claude_md=True),
+            RepoFeatures(name="empty-repo"),
+            RepoFeatures(name="another-active", has_agents=True),
+        ]
+        stats = OrgStats.aggregate("test-org", repos)
+        config = _make_config(show_sections=["details"])
+        result = render_stats(stats, config)
+
+        assert "active-repo" in result
+        assert "another-active" in result
+        assert "empty-repo" not in result
+
+    def test_detail_table_checkmarks(self):
+        """Verify checkmarks appear for enabled features."""
+        repos = [
+            RepoFeatures(
+                name="full-featured",
+                has_claude_md=True,
+                has_claude_dir=True,
+                has_custom_commands=True,
+                has_claude_actions=True,
+                has_hooks=True,
+                has_agents=True,
+                has_memory=True,
+                mcp_servers=["filesystem"],
+                custom_commands=["review"],
+                claude_action_names=["claude-code-action"],
+                hook_types=["PreToolUse"],
+            ),
+        ]
+        stats = OrgStats.aggregate("test-org", repos)
+        config = _make_config(show_sections=["details"])
+        result = render_stats(stats, config)
+
+        # Should have 8 checkmarks (one for each feature column)
+        assert result.count("✅") == 8
+
+    def test_adoption_only_shows_features_with_nonzero_count(self):
+        """Adoption section should only show features that exist in at least one repo."""
+        repos = [
+            RepoFeatures(name="repo1", has_claude_md=True),
+            RepoFeatures(name="repo2", has_claude_md=True),
+        ]
+        stats = OrgStats.aggregate("test-org", repos)
+        config = _make_config(show_sections=["adoption"])
+        result = render_stats(stats, config)
+
+        assert "Has CLAUDE.md" in result
+        # Features with 0 count should not appear
+        assert "Has MCP Servers" not in result
+        assert "Has Custom Commands" not in result
+        assert "Has Claude Actions" not in result
+        assert "Has Hooks" not in result
+        assert "Has Agents" not in result
+        assert "Has Memory" not in result
+
+    def test_all_sections_together(self):
+        """Test rendering all sections together."""
+        repos = [
+            RepoFeatures(
+                name="repo1",
+                has_claude_md=True,
+                mcp_servers=["filesystem"],
+                custom_commands=["review"],
+                claude_action_names=["claude-code-action"],
+                hook_types=["PreToolUse"],
+            ),
+            RepoFeatures(name="repo2", has_claude_md=True),
+        ]
+        stats = OrgStats.aggregate("test-org", repos)
+        config = _make_config(
+            show_sections=["adoption", "mcp", "skills", "actions", "hooks", "details"]
+        )
+        result = render_stats(stats, config)
+
+        # Check all sections appear
+        assert "Claude Code Adoption" in result
+        assert "Top MCP Servers" in result
+        assert "Top Custom Commands" in result
+        assert "Claude GitHub Actions" in result
+        assert "Hook Types" in result
+        assert "Per-repo breakdown" in result
+
+    def test_mcp_percentage_relative_to_mcp_repos(self):
+        """MCP server percentages should be relative to repos with MCP, not all repos."""
+        repos = [
+            RepoFeatures(name="repo1", mcp_servers=["filesystem", "github"]),
+            RepoFeatures(name="repo2", mcp_servers=["filesystem"]),
+            RepoFeatures(name="repo3"),  # No MCP
+            RepoFeatures(name="repo4"),  # No MCP
+        ]
+        stats = OrgStats.aggregate("test-org", repos)
+        config = _make_config(show_sections=["mcp"])
+        result = render_stats(stats, config)
+
+        # filesystem: 2/2 MCP repos = 100%
+        # github: 1/2 MCP repos = 50%
+        lines = result.split("\n")
+        filesystem_line = [l for l in lines if "filesystem" in l][0]
+        github_line = [l for l in lines if "github" in l][0]
+
+        assert "100.00 %" in filesystem_line
+        assert "50.00 %" in github_line
+
+    def test_skills_section_uses_correct_denominator(self):
+        """Skills/commands percentages should be relative to repos with commands."""
+        repos = [
+            RepoFeatures(
+                name="repo1",
+                has_custom_commands=True,
+                custom_commands=["review", "test"],
+            ),
+            RepoFeatures(
+                name="repo2",
+                has_custom_commands=True,
+                custom_commands=["review"],
+            ),
+            RepoFeatures(name="repo3"),  # No commands
+        ]
+        stats = OrgStats.aggregate("test-org", repos)
+        config = _make_config(show_sections=["skills"])
+        result = render_stats(stats, config)
+
+        # review: 2/2 command repos = 100%
+        # test: 1/2 command repos = 50%
+        lines = result.split("\n")
+        review_line = [l for l in lines if "review" in l][0]
+        test_line = [l for l in lines if "test" in l][0]
+
+        assert "100.00 %" in review_line
+        assert "50.00 %" in test_line
+
+    def test_zero_total_repos_no_division_error(self):
+        """Ensure no division by zero when total repos is 0."""
+        stats = OrgStats.aggregate("test-org", [])
+        config = _make_config(show_sections=["adoption"])
+        result = render_stats(stats, config)
+
+        assert "0 repos scanned" in result
+        # Should not raise any exceptions
+
+    def test_details_section_with_no_repos(self):
+        """Test details section returns nothing when there are no repos."""
+        stats = OrgStats.aggregate("test-org", [])
+        config = _make_config(show_sections=["details"])
+        result = render_stats(stats, config)
+
+        # Should be empty (no content)
+        assert result == ""
+
+    def test_details_section_with_only_inactive_repos(self):
+        """Test details section when all repos have no features."""
+        repos = [
+            RepoFeatures(name="empty1"),
+            RepoFeatures(name="empty2"),
+        ]
+        stats = OrgStats.aggregate("test-org", repos)
+        config = _make_config(show_sections=["details"])
+        result = render_stats(stats, config)
+
+        # Should be empty (no active repos to show)
+        assert result == ""
+
+    def test_format_row_with_zero_total(self):
+        """Test _format_row handles total=0 without division error."""
+        from src.renderer import _format_row
+        config = _make_config()
+
+        # Should not raise division by zero
+        result = _format_row("Test Label", 0, 0, config, show_bar=True)
+        assert "0.00 %" in result
+        assert "0 repos" in result

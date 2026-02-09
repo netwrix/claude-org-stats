@@ -127,6 +127,13 @@ class TestContentParsers:
         assert features.has_hooks is False
         assert features.mcp_servers == ["test"]
 
+    def test_parse_settings_json_invalid(self):
+        """Test that invalid settings.json doesn't crash."""
+        features = RepoFeatures(name="test")
+        parse_settings_json_content("not valid json", features)
+        assert features.mcp_servers == []
+        assert features.has_hooks is False
+
     def test_parse_workflow_claude_action(self):
         content = """
 name: Claude Code Review
@@ -173,3 +180,107 @@ jobs:
         assert features.has_memory is True
         assert features.has_agents is True
         assert sorted(features.custom_commands) == ["review", "test"]
+
+    def test_parse_workflow_multiple_actions(self):
+        """Test parsing workflow with multiple Claude actions."""
+        content = """
+name: CI
+on: push
+jobs:
+  review:
+    steps:
+      - uses: anthropics/claude-code-action@v1
+      - uses: anthropics/claude-code-base-action@v2
+"""
+        features = RepoFeatures(name="test")
+        parse_workflow_content(content, features)
+        assert features.has_claude_actions is True
+        assert "claude-code-action" in features.claude_action_names
+        assert "claude-code-base-action" in features.claude_action_names
+
+    def test_parse_mcp_json_no_servers(self):
+        """Test parsing .mcp.json with empty mcpServers."""
+        content = '{"mcpServers": {}}'
+        features = RepoFeatures(name="test")
+        parse_mcp_json_content(content, features)
+        assert features.mcp_servers == []
+
+    def test_parse_settings_json_empty_hooks(self):
+        """Test parsing settings.json with empty hook lists."""
+        content = json.dumps({
+            "mcpServers": {},
+            "hooks": {
+                "PreToolUse": [],
+                "PostToolUse": []
+            }
+        })
+        features = RepoFeatures(name="test")
+        parse_settings_json_content(content, features)
+        assert features.has_hooks is False
+        assert features.hook_types == []
+
+    def test_detect_custom_commands_ignores_directory_entry(self):
+        """Ensure we don't count the commands directory itself."""
+        features = RepoFeatures(name="test")
+        detect_custom_commands({".claude/commands/"}, features)
+        assert features.has_custom_commands is False
+        assert features.custom_commands == []
+
+    def test_detect_agents_ignores_directory_entry(self):
+        """Ensure we don't count the agents directory itself."""
+        features = RepoFeatures(name="test")
+        detect_agents({".claude/agents/"}, features)
+        assert features.has_agents is False
+
+    def test_parse_mcp_json_duplicate_servers(self):
+        """Test that duplicate server names are not added twice."""
+        features = RepoFeatures(name="test")
+        features.mcp_servers.append("filesystem")  # Pre-existing
+        content = '{"mcpServers": {"filesystem": {}}}'
+        parse_mcp_json_content(content, features)
+        # Should not duplicate
+        assert features.mcp_servers == ["filesystem"]
+
+    def test_parse_settings_json_duplicate_servers(self):
+        """Test that settings.json doesn't duplicate existing servers."""
+        features = RepoFeatures(name="test")
+        features.mcp_servers.append("postgres")  # Pre-existing
+        content = '{"mcpServers": {"postgres": {}}}'
+        parse_settings_json_content(content, features)
+        assert features.mcp_servers == ["postgres"]
+
+    def test_parse_settings_json_duplicate_hook_types(self):
+        """Test that hook types are not duplicated."""
+        features = RepoFeatures(name="test")
+        features.hook_types.append("PreToolUse")  # Pre-existing
+        content = json.dumps({
+            "hooks": {
+                "PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command"}]}]
+            }
+        })
+        parse_settings_json_content(content, features)
+        assert features.hook_types == ["PreToolUse"]
+
+    def test_parse_workflow_prevents_duplicate_action_names(self):
+        """Test that the same action name is not added twice."""
+        features = RepoFeatures(name="test")
+        content = "uses: anthropics/claude-code-action@v1\nuses: anthropics/claude-code-action@v2"
+        parse_workflow_content(content, features)
+        # Should only have unique names
+        assert features.claude_action_names.count("claude-code-action") == 1
+
+    def test_parse_workflow_case_insensitive(self):
+        """Test that workflow parsing is case insensitive."""
+        content = "uses: ANTHROPICS/CLAUDE-CODE-ACTION@v1"
+        features = RepoFeatures(name="test")
+        parse_workflow_content(content, features)
+        assert features.has_claude_actions is True
+        assert "claude-code-action" in features.claude_action_names
+
+    def test_parse_workflow_generic_claude_code_reference(self):
+        """Test detection of generic claude-code references."""
+        content = "This workflow uses claude-code for automated reviews"
+        features = RepoFeatures(name="test")
+        parse_workflow_content(content, features)
+        assert features.has_claude_actions is True
+        assert "claude-code (ref)" in features.claude_action_names
