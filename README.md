@@ -70,7 +70,7 @@ For each repository in the organization:
 | **Custom commands** | Files in `.claude/commands/` directory |
 | **Claude GitHub Actions** | References to Claude actions in `.github/workflows/*.yml` |
 | **Hooks** | Hook definitions in `.claude/settings.json` |
-| **Agents** | `AGENTS.md` files and `.claude/agents/` directory |
+| **Agents** | Agent files in `.claude/agents/` directory |
 | **Memory** | `MEMORY.md` files |
 
 ## Configuration
@@ -83,6 +83,7 @@ For each repository in the organization:
 | `SHOW_SECTIONS` | `adoption,mcp` | Sections to render (see below) |
 | `BLOCKS` | `░█` | Bar chart characters |
 | `BAR_LENGTH` | `25` | Bar width in characters |
+| `BAR_SECTIONS` | `adoption,mcp,skills,actions,hooks` | Sections that show progress bars (others show counts only) |
 | `MAX_ITEMS` | `10` | Max items in ranked lists |
 | `EXCLUDE_ARCHIVED` | `true` | Skip archived repos |
 | `EXCLUDE_FORKS` | `true` | Skip forked repos |
