@@ -264,7 +264,7 @@ class TestRenderStatsDetailedOutput:
             RepoFeatures(name="repo4"),  # No MCP
         ]
         stats = OrgStats.aggregate("test-org", repos)
-        config = _make_config(show_sections=["mcp"])
+        config = _make_config(show_sections=["mcp"], bar_sections=["mcp"])
         result = render_stats(stats, config)
 
         # filesystem: 2/2 MCP repos = 100%

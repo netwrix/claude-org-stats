@@ -45,12 +45,10 @@ def _render_adoption(stats: OrgStats, config: Config, show_bar: bool = True) -> 
     items = [
         ("Has CLAUDE.md", stats.claude_md_count),
         ("Has .claude/ Dir", stats.claude_dir_count),
-        ("Has MCP Servers", stats.mcp_servers_count),
         ("Has Skills", stats.custom_commands_count),
-        ("Has Claude Actions", stats.claude_actions_count),
-        ("Has Hooks", stats.hooks_count),
         ("Has Agents", stats.agents_count),
-        ("Has Memory", stats.memory_count),
+        ("Has Hooks", stats.hooks_count),
+        ("Has GitHub Actions", stats.claude_actions_count),
     ]
     # Only show items with count > 0
     items = [(label, count) for label, count in items if count > 0]
@@ -113,13 +111,6 @@ def _render_details(stats: OrgStats, _config: Config) -> list[str]:
 # Each value is a callable(stats, config, show_bar) -> list[str].
 _CHART_SECTIONS = {
     "adoption": lambda stats, config, show_bar: _render_adoption(stats, config, show_bar),
-    "mcp": lambda stats, config, show_bar: _render_ranked(
-        f"🔧 Top MCP Servers (of {stats.mcp_servers_count} repos with MCP)",
-        stats.mcp_server_counter,
-        stats.mcp_servers_count,
-        config,
-        show_bar,
-    ),
     "skills": lambda stats, config, show_bar: _render_ranked(
         f"⚡ Top Skills (of {stats.custom_commands_count} repos)",
         stats.custom_command_counter,
@@ -127,10 +118,10 @@ _CHART_SECTIONS = {
         config,
         show_bar,
     ),
-    "actions": lambda stats, config, show_bar: _render_ranked(
-        f"🤖 Top GitHub Actions (of {stats.claude_actions_count} repos)",
-        stats.claude_action_counter,
-        stats.claude_actions_count,
+    "agents": lambda stats, config, show_bar: _render_ranked(
+        f"🕵️ Top Agents (of {stats.agents_count} repos)",
+        stats.agent_name_counter,
+        stats.agents_count,
         config,
         show_bar,
     ),
@@ -141,10 +132,17 @@ _CHART_SECTIONS = {
         config,
         show_bar,
     ),
-    "agents": lambda stats, config, show_bar: _render_ranked(
-        f"🕵️ Top Agents (of {stats.agents_count} repos)",
-        stats.agent_name_counter,
-        stats.agents_count,
+    "actions": lambda stats, config, show_bar: _render_ranked(
+        f"🤖 Top GitHub Actions (of {stats.claude_actions_count} repos)",
+        stats.claude_action_counter,
+        stats.claude_actions_count,
+        config,
+        show_bar,
+    ),
+    "mcp": lambda stats, config, show_bar: _render_ranked(
+        f"🔧 Top MCP Servers (of {stats.mcp_servers_count} repos with MCP)",
+        stats.mcp_server_counter,
+        stats.mcp_servers_count,
         config,
         show_bar,
     ),

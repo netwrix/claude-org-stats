@@ -9,10 +9,10 @@ class Config:
     gh_token: str
     org_name: str
     repository: str = ""
-    show_sections: list[str] = field(default_factory=lambda: ["adoption", "mcp"])
+    show_sections: list[str] = field(default_factory=lambda: ["adoption", "skills", "agents", "hooks", "actions"])
     blocks: str = "░█"
     bar_length: int = 25
-    bar_sections: list[str] = field(default_factory=lambda: ["adoption", "mcp", "skills", "actions", "hooks", "agents"])
+    bar_sections: list[str] = field(default_factory=lambda: ["adoption", "skills", "agents", "hooks", "actions"])
     max_items: int = 10
     exclude_archived: bool = True
     exclude_forks: bool = True
@@ -29,13 +29,13 @@ class Config:
         def get(name: str, default: str = "") -> str:
             return os.environ.get(f"INPUT_{name}", os.environ.get(name, default))
 
-        sections_raw = get("SHOW_SECTIONS", "adoption,mcp")
+        sections_raw = get("SHOW_SECTIONS", "adoption,skills,agents,hooks,actions")
         sections = [s.strip() for s in sections_raw.split(",") if s.strip()]
 
         exclude_raw = get("EXCLUDE_REPOS", "")
         exclude = [r.strip() for r in exclude_raw.split(",") if r.strip()]
 
-        bar_raw = get("BAR_SECTIONS", "adoption,mcp,skills,actions,hooks")
+        bar_raw = get("BAR_SECTIONS", "adoption,skills,agents,hooks,actions")
         bar_sections = [s.strip() for s in bar_raw.split(",") if s.strip()]
 
         return Config(

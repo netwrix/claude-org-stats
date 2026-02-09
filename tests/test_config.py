@@ -22,10 +22,10 @@ class TestConfigFromEnv:
         config = Config.from_env()
 
         assert config.repository == ""
-        assert config.show_sections == ["adoption", "mcp"]
+        assert config.show_sections == ["adoption", "skills", "agents", "hooks", "actions"]
         assert config.blocks == "░█"
         assert config.bar_length == 25
-        assert config.bar_sections == ["adoption", "mcp", "skills", "actions", "hooks"]
+        assert config.bar_sections == ["adoption", "skills", "agents", "hooks", "actions"]
         assert config.max_items == 10
         assert config.exclude_archived is True
         assert config.exclude_forks is True

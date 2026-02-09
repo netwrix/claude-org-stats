@@ -10,15 +10,12 @@ A GitHub Action that scans repositories in your GitHub organization (or profile)
 Has CLAUDE.md          31 repos   ███░░░░░░░░░░░░░░░░░░░░░░  12.65 %
 Has .claude/ Dir       13 repos   █░░░░░░░░░░░░░░░░░░░░░░░░   5.31 %
 Has Skills              2 repos   ░░░░░░░░░░░░░░░░░░░░░░░░░   0.82 %
-Has Claude Actions      2 repos   ░░░░░░░░░░░░░░░░░░░░░░░░░   0.82 %
+Has GitHub Actions      2 repos   ░░░░░░░░░░░░░░░░░░░░░░░░░   0.82 %
 
 ⚡ Top Skills (of 2 repos)
 commit-push-pr          1 repos
 dedupe                  1 repos
 oncall-triage           1 repos
-devops                  1 repos
-pr                      1 repos
-rebase                  1 repos
 
 🤖 Top GitHub Actions (of 2 repos)
 claude-code-action      2 repos
@@ -97,10 +94,10 @@ For each repository in the organization:
 | `GH_TOKEN` | *required* | GitHub token with org:read scope |
 | `ORG_NAME` | *required* | GitHub organization to scan |
 | `REPOSITORY` | `""` | Repository to update (owner/repo format) |
-| `SHOW_SECTIONS` | `adoption,mcp` | Sections to render (see below) |
+| `SHOW_SECTIONS` | `adoption,skills,agents,hooks,actions` | Sections to render (see below) |
 | `BLOCKS` | `░█` | Bar chart characters |
 | `BAR_LENGTH` | `25` | Bar width in characters |
-| `BAR_SECTIONS` | `adoption,mcp,skills,actions,hooks,agents` | Sections that show progress bars (others show counts only) |
+| `BAR_SECTIONS` | `adoption,skills,agents,hooks,actions` | Sections that show progress bars (others show counts only) |
 | `MAX_ITEMS` | `10` | Max items in ranked lists |
 | `EXCLUDE_ARCHIVED` | `true` | Skip archived repos |
 | `EXCLUDE_FORKS` | `true` | Skip forked repos |
@@ -113,17 +110,17 @@ For each repository in the organization:
 ### Available Sections
 
 - `adoption` - Overview bar chart of all feature adoption rates
-- `mcp` - Ranked list of most common MCP servers
 - `skills` - Ranked list of skills (from `.claude/commands/` and `.claude/skills/`)
-- `actions` - Ranked list of Claude GitHub Actions
-- `hooks` - Ranked list of hook types
 - `agents` - Ranked list of Claude agents
+- `hooks` - Ranked list of hook types
+- `actions` - Ranked list of Claude GitHub Actions
+- `mcp` - Ranked list of MCP servers
 - `details` - Per-repo table with checkmarks
 
 Example with all sections:
 
 ```yaml
-SHOW_SECTIONS: "adoption,mcp,skills,actions,hooks,agents,details"
+SHOW_SECTIONS: "adoption,skills,agents,hooks,actions,mcp,details"
 ```
 
 ### Custom Bar Styles
