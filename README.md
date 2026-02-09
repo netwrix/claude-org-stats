@@ -20,7 +20,7 @@ rebase                  1 repos
 devops                  1 repos
 pr                      1 repos
 
-🤖 Claude GitHub Actions (of 2 repos)
+🤖 Top GitHub Actions (of 2 repos)
 claude-code-action      2 repos
 claude-code (ref)       2 repos
 ```
@@ -99,7 +99,7 @@ For each repository in the organization:
 | `SHOW_SECTIONS` | `adoption,mcp` | Sections to render (see below) |
 | `BLOCKS` | `░█` | Bar chart characters |
 | `BAR_LENGTH` | `25` | Bar width in characters |
-| `BAR_SECTIONS` | `adoption,mcp,skills,actions,hooks` | Sections that show progress bars (others show counts only) |
+| `BAR_SECTIONS` | `adoption,mcp,skills,actions,hooks,agents` | Sections that show progress bars (others show counts only) |
 | `MAX_ITEMS` | `10` | Max items in ranked lists |
 | `EXCLUDE_ARCHIVED` | `true` | Skip archived repos |
 | `EXCLUDE_FORKS` | `true` | Skip forked repos |
@@ -116,12 +116,13 @@ For each repository in the organization:
 - `skills` - Ranked list of skills (from `.claude/commands/` and `.claude/skills/`)
 - `actions` - Ranked list of Claude GitHub Actions
 - `hooks` - Ranked list of hook types
+- `agents` - Ranked list of Claude agents
 - `details` - Per-repo table with checkmarks
 
 Example with all sections:
 
 ```yaml
-SHOW_SECTIONS: "adoption,mcp,skills,actions,hooks,details"
+SHOW_SECTIONS: "adoption,mcp,skills,actions,hooks,agents,details"
 ```
 
 ### Custom Bar Styles

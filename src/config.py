@@ -12,7 +12,7 @@ class Config:
     show_sections: list[str] = field(default_factory=lambda: ["adoption", "mcp"])
     blocks: str = "░█"
     bar_length: int = 25
-    bar_sections: list[str] = field(default_factory=lambda: ["adoption", "mcp", "skills", "actions", "hooks"])
+    bar_sections: list[str] = field(default_factory=lambda: ["adoption", "mcp", "skills", "actions", "hooks", "agents"])
     max_items: int = 10
     exclude_archived: bool = True
     exclude_forks: bool = True

@@ -18,7 +18,7 @@ inputs:
     required: false
     default: ""
   SHOW_SECTIONS:
-    description: "Comma-separated list of sections to render: adoption, mcp, skills, actions, hooks, details"
+    description: "Comma-separated list of sections to render: adoption, mcp, skills, actions, hooks, agents, details"
     required: false
     default: "adoption,mcp"
   BLOCKS:
@@ -32,7 +32,7 @@ inputs:
   BAR_SECTIONS:
     description: "Comma-separated list of sections that show progress bars (others show counts only)"
     required: false
-    default: "adoption,mcp,skills,actions,hooks"
+    default: "adoption,mcp,skills,actions,hooks,agents"
   MAX_ITEMS:
     description: "Maximum items to show in ranked lists"
     required: false

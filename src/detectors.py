@@ -55,8 +55,11 @@ def detect_agents(tree_paths: set[str], features: RepoFeatures) -> None:
     prefix = ".claude/agents/"
     for path in tree_paths:
         if path.startswith(prefix) and path != prefix:
-            features.has_agents = True
-            return
+            name = PurePosixPath(path).stem
+            if name not in features.agent_names:
+                features.agent_names.append(name)
+    if features.agent_names:
+        features.has_agents = True
 
 
 # ---------------------------------------------------------------------------

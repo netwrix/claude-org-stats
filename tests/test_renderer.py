@@ -251,8 +251,8 @@ class TestRenderStatsDetailedOutput:
         assert "Claude Code Adoption" in result
         assert "Top MCP Servers" in result
         assert "Top Skills" in result
-        assert "Claude GitHub Actions" in result
-        assert "Hook Types" in result
+        assert "Top GitHub Actions" in result
+        assert "Top Hooks" in result
         assert "Per-repo breakdown" in result
 
     def test_mcp_percentage_relative_to_mcp_repos(self):

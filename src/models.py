@@ -18,6 +18,7 @@ class RepoFeatures:
     custom_commands: list[str] = field(default_factory=list)
     claude_action_names: list[str] = field(default_factory=list)
     hook_types: list[str] = field(default_factory=list)
+    agent_names: list[str] = field(default_factory=list)
 
     @property
     def has_mcp_servers(self) -> bool:
@@ -45,6 +46,7 @@ class OrgStats:
     custom_command_counter: Counter = field(default_factory=Counter)
     claude_action_counter: Counter = field(default_factory=Counter)
     hook_type_counter: Counter = field(default_factory=Counter)
+    agent_name_counter: Counter = field(default_factory=Counter)
 
     @staticmethod
     def aggregate(org_name: str, repos: list[RepoFeatures]) -> OrgStats:
@@ -75,5 +77,7 @@ class OrgStats:
                 stats.claude_action_counter[action] += 1
             for hook in repo.hook_types:
                 stats.hook_type_counter[hook] += 1
+            for agent in repo.agent_names:
+                stats.agent_name_counter[agent] += 1
 
         return stats
