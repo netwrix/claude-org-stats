@@ -1,6 +1,6 @@
 # claude-org-stats
 
-A GitHub Action that scans repositories in your GitHub organization and generates visual ASCII bar charts showing Claude Code adoption statistics. Inspired by [waka-readme](https://github.com/athul/waka-readme).
+A GitHub Action that scans repositories in your GitHub organization (or profile) and generates visual ASCII bar charts showing Claude Code adoption statistics. Inspired by [waka-readme](https://github.com/athul/waka-readme).
 
 ## Example Output
 
@@ -15,9 +15,9 @@ Has Claude Actions     6 repos   █████░░░░░░░░░░�
 Has Hooks              4 repos   ███░░░░░░░░░░░░░░░░░░░░░░  12.90 %
 
 🔧 Top MCP Servers (of 12 repos with MCP)
-filesystem            8 repos   ████████████████░░░░░░░░░  66.67 %
-github                6 repos   ████████████░░░░░░░░░░░░░  50.00 %
-slack                 3 repos   ██████░░░░░░░░░░░░░░░░░░░  25.00 %
+filesystem            8 repos
+github                6 repos
+slack                 3 repos
 ```
 
 ## Setup
@@ -122,12 +122,12 @@ BLOCKS: "⣀⣄⣤⣦⣶⣷⣿"
 
 ## API Efficiency
 
-The action uses the Git Tree API for minimal API calls:
+Uses the Git Tree API for minimal API calls:
 
-- **1 API call per repo** to get the full file tree
-- **0-3 additional calls per repo** only for files needing content parsing (`.mcp.json`, `.claude/settings.json`, workflow files)
+- 1 API call per repo to get the full file tree
+- 0-3 additional calls per repo only for files needing content parsing (`.mcp.json`, `.claude/settings.json`, workflow files)
 - For a 100-repo org: ~100-400 API calls total, well within GitHub's 5,000/hour limit
-- Built-in rate limit detection with automatic backoff
+- Rate limit detection with automatic backoff
 
 ## Local Testing
 
