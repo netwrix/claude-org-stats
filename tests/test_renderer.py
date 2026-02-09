@@ -84,6 +84,35 @@ class TestRenderStats:
         result = render_stats(stats, config)
         assert "Top MCP Servers" not in result
 
+    def test_no_bars_shows_counts_only(self):
+        stats = _make_stats()
+        config = _make_config(show_sections=["adoption"], bar_sections=[])
+        result = render_stats(stats, config)
+        assert "Has CLAUDE.md" in result
+        assert "2 repos" in result
+        assert "░" not in result
+        assert "█" not in result
+        assert "%" not in result
+
+    def test_bars_enabled_by_default(self):
+        stats = _make_stats()
+        config = _make_config(show_sections=["adoption"])
+        result = render_stats(stats, config)
+        assert "█" in result
+        assert "%" in result
+
+    def test_mixed_bar_sections(self):
+        stats = _make_stats()
+        config = _make_config(show_sections=["adoption", "mcp"], bar_sections=["adoption"])
+        result = render_stats(stats, config)
+        # Adoption should have bars
+        assert "50.00 %" in result
+        # MCP should just have counts (no percentage after server names)
+        lines = result.split("\n")
+        mcp_lines = [l for l in lines if "filesystem" in l]
+        assert len(mcp_lines) == 1
+        assert "%" not in mcp_lines[0]
+
 
 class TestReplaceSection:
     def test_basic_replacement(self):

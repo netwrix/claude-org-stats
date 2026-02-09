@@ -12,6 +12,7 @@ class Config:
     show_sections: list[str] = field(default_factory=lambda: ["adoption", "mcp"])
     blocks: str = "░█"
     bar_length: int = 25
+    bar_sections: list[str] = field(default_factory=lambda: ["adoption", "mcp", "skills", "actions", "hooks"])
     max_items: int = 10
     exclude_archived: bool = True
     exclude_forks: bool = True
@@ -34,6 +35,9 @@ class Config:
         exclude_raw = get("EXCLUDE_REPOS", "")
         exclude = [r.strip() for r in exclude_raw.split(",") if r.strip()]
 
+        bar_raw = get("BAR_SECTIONS", "adoption,mcp,skills,actions,hooks")
+        bar_sections = [s.strip() for s in bar_raw.split(",") if s.strip()]
+
         return Config(
             gh_token=get("GH_TOKEN"),
             org_name=get("ORG_NAME"),
@@ -41,6 +45,7 @@ class Config:
             show_sections=sections,
             blocks=get("BLOCKS", "░█"),
             bar_length=int(get("BAR_LENGTH", "25")),
+            bar_sections=bar_sections,
             max_items=int(get("MAX_ITEMS", "10")),
             exclude_archived=get("EXCLUDE_ARCHIVED", "true").lower() == "true",
             exclude_forks=get("EXCLUDE_FORKS", "true").lower() == "true",

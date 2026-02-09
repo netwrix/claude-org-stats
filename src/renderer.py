@@ -7,14 +7,16 @@ from .graph import make_graph
 from .models import OrgStats
 
 
-def _format_row(label: str, count: int, total: int, config: Config) -> str:
-    """Format a single bar chart row."""
+def _format_row(label: str, count: int, total: int, config: Config, show_bar: bool = True) -> str:
+    """Format a single row, optionally with a bar chart."""
     if total == 0:
         percent = 0.0
     else:
         percent = count / total * 100
-    bar = make_graph(percent, bar_length=config.bar_length, blocks=config.blocks)
-    return f"{label:<22}{count:>3} repos   {bar}  {percent:5.2f} %"
+    if show_bar:
+        bar = make_graph(percent, bar_length=config.bar_length, blocks=config.blocks)
+        return f"{label:<22}{count:>3} repos   {bar}  {percent:5.2f} %"
+    return f"{label:<22}{count:>3} repos"
 
 
 def _render_ranked(
@@ -22,19 +24,23 @@ def _render_ranked(
     counter: Counter,
     total: int,
     config: Config,
+    show_bar: bool = True,
 ) -> list[str]:
     """Render a ranked section from a Counter."""
     if not counter:
         return []
     lines = [f"\n{title}"]
     for name, count in counter.most_common(config.max_items):
-        percent = count / total * 100 if total > 0 else 0
-        bar = make_graph(percent, bar_length=config.bar_length, blocks=config.blocks)
-        lines.append(f"{name:<22}{count:>3} repos   {bar}  {percent:5.2f} %")
+        if show_bar:
+            percent = count / total * 100 if total > 0 else 0
+            bar = make_graph(percent, bar_length=config.bar_length, blocks=config.blocks)
+            lines.append(f"{name:<22}{count:>3} repos   {bar}  {percent:5.2f} %")
+        else:
+            lines.append(f"{name:<22}{count:>3} repos")
     return lines
 
 
-def _render_adoption(stats: OrgStats, config: Config) -> list[str]:
+def _render_adoption(stats: OrgStats, config: Config, show_bar: bool = True) -> list[str]:
     """Render the adoption overview section."""
     items = [
         ("Has CLAUDE.md", stats.claude_md_count),
@@ -54,7 +60,7 @@ def _render_adoption(stats: OrgStats, config: Config) -> list[str]:
         return lines
 
     for label, count in items:
-        lines.append(_format_row(label, count, stats.total_repos, config))
+        lines.append(_format_row(label, count, stats.total_repos, config, show_bar))
     return lines
 
 
@@ -104,31 +110,36 @@ def _render_details(stats: OrgStats, _config: Config) -> list[str]:
 
 
 # Chart sections return raw lines (no code fences); render_stats wraps them.
+# Each value is a callable(stats, config, show_bar) -> list[str].
 _CHART_SECTIONS = {
-    "adoption": lambda stats, config: _render_adoption(stats, config),
-    "mcp": lambda stats, config: _render_ranked(
+    "adoption": lambda stats, config, show_bar: _render_adoption(stats, config, show_bar),
+    "mcp": lambda stats, config, show_bar: _render_ranked(
         f"🔧 Top MCP Servers (of {stats.mcp_servers_count} repos with MCP)",
         stats.mcp_server_counter,
         stats.mcp_servers_count,
         config,
+        show_bar,
     ),
-    "skills": lambda stats, config: _render_ranked(
+    "skills": lambda stats, config, show_bar: _render_ranked(
         f"⚡ Top Custom Commands (of {stats.custom_commands_count} repos)",
         stats.custom_command_counter,
         stats.custom_commands_count,
         config,
+        show_bar,
     ),
-    "actions": lambda stats, config: _render_ranked(
+    "actions": lambda stats, config, show_bar: _render_ranked(
         f"🤖 Claude GitHub Actions (of {stats.claude_actions_count} repos)",
         stats.claude_action_counter,
         stats.claude_actions_count,
         config,
+        show_bar,
     ),
-    "hooks": lambda stats, config: _render_ranked(
+    "hooks": lambda stats, config, show_bar: _render_ranked(
         f"🪝 Hook Types (of {stats.hooks_count} repos)",
         stats.hook_type_counter,
         stats.hooks_count,
         config,
+        show_bar,
     ),
 }
 
@@ -145,7 +156,8 @@ def render_stats(stats: OrgStats, config: Config) -> str:
 
     for section in config.show_sections:
         if section in _CHART_SECTIONS:
-            lines = _CHART_SECTIONS[section](stats, config)
+            show_bar = section in config.bar_sections
+            lines = _CHART_SECTIONS[section](stats, config, show_bar)
             if lines:
                 chart_lines.extend(lines)
         elif section in _OTHER_SECTIONS:

@@ -29,6 +29,10 @@ inputs:
     description: "Width of bar charts in characters"
     required: false
     default: "25"
+  BAR_SECTIONS:
+    description: "Comma-separated list of sections that show progress bars (others show counts only)"
+    required: false
+    default: "adoption,mcp,skills,actions,hooks"
   MAX_ITEMS:
     description: "Maximum items to show in ranked lists"
     required: false
