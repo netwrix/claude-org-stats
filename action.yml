@@ -1,0 +1,75 @@
+name: "Claude Code Org Stats"
+description: "Scan repositories in a GitHub organization and generate visual Claude Code adoption statistics"
+author: "claude-org-stats"
+
+branding:
+  icon: "bar-chart-2"
+  color: "orange"
+
+inputs:
+  GH_TOKEN:
+    description: "GitHub token with org:read and repo scope"
+    required: true
+  ORG_NAME:
+    description: "GitHub organization to scan"
+    required: true
+  REPOSITORY:
+    description: "Repository to update README in (owner/repo format). Defaults to the repo running the action."
+    required: false
+    default: ""
+  SHOW_SECTIONS:
+    description: "Comma-separated list of sections to render: adoption, mcp, skills, actions, hooks, details"
+    required: false
+    default: "adoption,mcp"
+  BLOCKS:
+    description: "Characters used for bar chart (empty and filled)"
+    required: false
+    default: "░█"
+  BAR_LENGTH:
+    description: "Width of bar charts in characters"
+    required: false
+    default: "25"
+  MAX_ITEMS:
+    description: "Maximum items to show in ranked lists"
+    required: false
+    default: "10"
+  EXCLUDE_ARCHIVED:
+    description: "Skip archived repositories"
+    required: false
+    default: "true"
+  EXCLUDE_FORKS:
+    description: "Skip forked repositories"
+    required: false
+    default: "true"
+  EXCLUDE_REPOS:
+    description: "Comma-separated list of repo names to skip"
+    required: false
+    default: ""
+  SECTION_NAME:
+    description: "Name used in comment markers (<!--START_SECTION:name-->)"
+    required: false
+    default: "claude-stats"
+  TARGET_PATH:
+    description: "Path to the file to update"
+    required: false
+    default: "README.md"
+  TARGET_BRANCH:
+    description: "Branch to commit to (defaults to repo default branch)"
+    required: false
+    default: ""
+  COMMIT_MESSAGE:
+    description: "Commit message for README update"
+    required: false
+    default: "Update Claude Code adoption stats"
+  COMMITTER_NAME:
+    description: "Git committer name"
+    required: false
+    default: "github-actions[bot]"
+  COMMITTER_EMAIL:
+    description: "Git committer email"
+    required: false
+    default: "github-actions[bot]@users.noreply.github.com"
+
+runs:
+  using: "docker"
+  image: "Dockerfile"

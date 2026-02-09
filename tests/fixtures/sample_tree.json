@@ -1,0 +1,16 @@
+[
+  {"path": "CLAUDE.md", "type": "blob"},
+  {"path": ".claude", "type": "tree"},
+  {"path": ".claude/settings.json", "type": "blob"},
+  {"path": ".claude/commands", "type": "tree"},
+  {"path": ".claude/commands/review.md", "type": "blob"},
+  {"path": ".claude/commands/test.md", "type": "blob"},
+  {"path": ".claude/agents", "type": "tree"},
+  {"path": ".claude/agents/reviewer.md", "type": "blob"},
+  {"path": ".mcp.json", "type": "blob"},
+  {"path": "MEMORY.md", "type": "blob"},
+  {"path": "src/main.py", "type": "blob"},
+  {"path": ".github/workflows/ci.yml", "type": "blob"},
+  {"path": ".github/workflows/claude.yml", "type": "blob"},
+  {"path": "docs/AGENTS.md", "type": "blob"}
+]
