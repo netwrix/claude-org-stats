@@ -5,19 +5,24 @@ A GitHub Action that scans repositories in your GitHub organization (or profile)
 ## Example Output
 
 ```
-📊 Claude Code Adoption (31 repos scanned)
+📊 Claude Code Adoption (245 repos scanned)
 
-Has CLAUDE.md         15 repos   ████████████░░░░░░░░░░░░░  48.39 %
-Has .claude/ Dir      12 repos   ██████████░░░░░░░░░░░░░░░  38.71 %
-Has MCP Servers       12 repos   ██████████░░░░░░░░░░░░░░░  38.71 %
-Has Skills             8 repos   ██████░░░░░░░░░░░░░░░░░░░  25.81 %
-Has Claude Actions     6 repos   █████░░░░░░░░░░░░░░░░░░░░  19.35 %
-Has Hooks              4 repos   ███░░░░░░░░░░░░░░░░░░░░░░  12.90 %
+Has CLAUDE.md          31 repos   ███░░░░░░░░░░░░░░░░░░░░░░  12.65 %
+Has .claude/ Dir       13 repos   █░░░░░░░░░░░░░░░░░░░░░░░░   5.31 %
+Has Skills              2 repos   ░░░░░░░░░░░░░░░░░░░░░░░░░   0.82 %
+Has Claude Actions      2 repos   ░░░░░░░░░░░░░░░░░░░░░░░░░   0.82 %
 
-🔧 Top MCP Servers (of 12 repos with MCP)
-filesystem            8 repos
-github                6 repos
-slack                 3 repos
+⚡ Top Skills (of 2 repos)
+oncall-triage           1 repos
+dedupe                  1 repos
+commit-push-pr          1 repos
+rebase                  1 repos
+devops                  1 repos
+pr                      1 repos
+
+🤖 Claude GitHub Actions (of 2 repos)
+claude-code-action      2 repos
+claude-code (ref)       2 repos
 ```
 
 ## Setup
