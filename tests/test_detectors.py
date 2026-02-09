@@ -69,10 +69,10 @@ class TestTreeDetectors:
         detect_memory({"README.md"}, features)
         assert features.has_memory is False
 
-    def test_detect_agents_md(self):
+    def test_detect_agents_md_not_detected(self):
         features = RepoFeatures(name="test")
         detect_agents({"docs/AGENTS.md"}, features)
-        assert features.has_agents is True
+        assert features.has_agents is False
 
     def test_detect_agents_dir(self):
         features = RepoFeatures(name="test")

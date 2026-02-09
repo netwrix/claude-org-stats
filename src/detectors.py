@@ -43,12 +43,10 @@ def detect_memory(tree_paths: set[str], features: RepoFeatures) -> None:
 
 
 def detect_agents(tree_paths: set[str], features: RepoFeatures) -> None:
-    """Detect AGENTS.md files and .claude/agents/ directory."""
+    """Detect Claude agent files in .claude/agents/ directory."""
+    prefix = ".claude/agents/"
     for path in tree_paths:
-        if PurePosixPath(path).name == "AGENTS.md":
-            features.has_agents = True
-            return
-        if path.startswith(".claude/agents/"):
+        if path.startswith(prefix) and path != prefix:
             features.has_agents = True
             return
 
