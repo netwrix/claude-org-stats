@@ -117,22 +117,6 @@ For each repository in the organization:
 | `TARGET_BRANCH` | `""` | Branch to commit to (default: repo default) |
 | `COMMIT_MESSAGE` | `Update Claude Code adoption stats` | Commit message |
 
-### Available Sections
-
-- `adoption` - Overview bar chart of all feature adoption rates
-- `skills` - Ranked list of skills (from `.claude/commands/` and `.claude/skills/`)
-- `agents` - Ranked list of Claude agents
-- `hooks` - Ranked list of hook types
-- `actions` - Ranked list of Claude GitHub Actions
-- `mcp` - Ranked list of MCP servers
-- `details` - Per-repo table with checkmarks
-
-Example with all sections:
-
-```yaml
-SHOW_SECTIONS: "adoption,skills,agents,hooks,actions,mcp,details"
-```
-
 ### Custom Bar Styles
 
 ```yaml
@@ -145,15 +129,6 @@ BLOCKS: "░▒▓█"
 # Braille
 BLOCKS: "⣀⣄⣤⣦⣶⣷⣿"
 ```
-
-## API Efficiency
-
-Uses the Git Tree API for minimal API calls:
-
-- 1 API call per repo to get the full file tree
-- 0-3 additional calls per repo only for files needing content parsing (`.mcp.json`, `.claude/settings.json`, workflow files)
-- For a 100-repo org: ~100-400 API calls total, well within GitHub's 5,000/hour limit
-- Rate limit detection with automatic backoff
 
 ## Local Testing
 
