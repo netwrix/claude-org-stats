@@ -14,6 +14,8 @@ class RepoFeatures:
     has_hooks: bool = False
     has_agents: bool = False
     has_memory: bool = False
+    is_stale: bool = False  # True if no commits in 3+ months
+    is_new: bool = False  # True if created within last 7 days
     mcp_servers: list[str] = field(default_factory=list)
     custom_commands: list[str] = field(default_factory=list)
     claude_action_names: list[str] = field(default_factory=list)
@@ -40,6 +42,8 @@ class OrgStats:
     hooks_count: int = 0
     agents_count: int = 0
     memory_count: int = 0
+    stale_count: int = 0
+    new_count: int = 0
 
     # Detailed breakdowns
     mcp_server_counter: Counter = field(default_factory=Counter)
@@ -68,6 +72,10 @@ class OrgStats:
                 stats.agents_count += 1
             if repo.has_memory:
                 stats.memory_count += 1
+            if repo.is_stale:
+                stats.stale_count += 1
+            if repo.is_new:
+                stats.new_count += 1
 
             for server in repo.mcp_servers:
                 stats.mcp_server_counter[server] += 1

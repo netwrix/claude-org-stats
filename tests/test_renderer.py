@@ -67,7 +67,7 @@ class TestRenderStats:
         result = render_stats(stats, config)
         assert "Per-repo breakdown" in result
         assert "repo-a" in result
-        assert "repo-d" not in result  # no features
+        assert "repo-d" in result  # All repos shown (including those without features)
         assert ".claude/" in result  # .claude/ column present
 
     def test_custom_bar_length(self):
@@ -166,11 +166,11 @@ class TestRenderStatsDetailedOutput:
         config = _make_config(show_sections=["details"])
         result = render_stats(stats, config)
 
-        # Check header row
-        assert "| Repo | CLAUDE.md | .claude/ | MCP | Skills | Actions | Hooks | Agents | Memory |" in result
+        # Check header row includes new "New" and "Stale" columns
+        assert "| Repo | CLAUDE.md | .claude/ | MCP | Skills | Actions | Hooks | Agents | Memory | New | Stale |" in result
 
-    def test_detail_table_only_shows_repos_with_features(self):
-        """Repos with no features should not appear in detail table."""
+    def test_detail_table_shows_all_repos(self):
+        """All repos should appear in detail table, including those without features."""
         repos = [
             RepoFeatures(name="active-repo", has_claude_md=True),
             RepoFeatures(name="empty-repo"),
@@ -182,7 +182,7 @@ class TestRenderStatsDetailedOutput:
 
         assert "active-repo" in result
         assert "another-active" in result
-        assert "empty-repo" not in result
+        assert "empty-repo" in result  # All repos shown now
 
     def test_detail_table_checkmarks(self):
         """Verify checkmarks appear for enabled features."""
@@ -208,6 +208,25 @@ class TestRenderStatsDetailedOutput:
 
         # Should have 8 checkmarks (one for each feature column)
         assert result.count("✅") == 8
+
+    def test_detail_table_new_and_stale_indicators(self):
+        """Verify new and stale indicators appear in detail table."""
+        repos = [
+            RepoFeatures(name="new-repo", is_new=True, has_claude_md=True),
+            RepoFeatures(name="stale-repo", is_stale=True, has_claude_dir=True),
+            RepoFeatures(name="normal-repo", has_agents=True),
+        ]
+        stats = OrgStats.aggregate("test-org", repos)
+        config = _make_config(show_sections=["details"])
+        result = render_stats(stats, config)
+
+        # Should have 1 new indicator (🆕) and 1 stale indicator (⚠️)
+        assert result.count("🆕") == 1
+        assert result.count("⚠️") == 1
+        # Verify they appear in correct rows
+        assert "new-repo" in result
+        assert "stale-repo" in result
+        assert "normal-repo" in result
 
     def test_adoption_only_shows_features_with_nonzero_count(self):
         """Adoption section should only show features that exist in at least one repo."""
@@ -332,8 +351,10 @@ class TestRenderStatsDetailedOutput:
         config = _make_config(show_sections=["details"])
         result = render_stats(stats, config)
 
-        # Should be empty (no active repos to show)
-        assert result == ""
+        # Should still show all repos, even those without features
+        assert "Per-repo breakdown" in result
+        assert "empty1" in result
+        assert "empty2" in result
 
     def test_format_row_with_zero_total(self):
         """Test _format_row handles total=0 without division error."""

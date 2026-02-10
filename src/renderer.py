@@ -49,6 +49,8 @@ def _render_adoption(stats: OrgStats, config: Config, show_bar: bool = True) -> 
         ("Has Agents", stats.agents_count),
         ("Has Hooks", stats.hooks_count),
         ("Has GitHub Actions", stats.claude_actions_count),
+        ("New (<7 days)", stats.new_count),
+        ("Stale (3+ months)", stats.stale_count),
     ]
     # Only show items with count > 0
     items = [(label, count) for label, count in items if count > 0]
@@ -67,16 +69,9 @@ def _render_details(stats: OrgStats, _config: Config) -> list[str]:
     if not stats.repos:
         return []
 
-    # Only include repos with at least one feature
-    active_repos = [r for r in stats.repos if any([
-        r.has_claude_md, r.has_claude_dir, r.has_mcp_servers,
-        r.has_custom_commands, r.has_claude_actions, r.has_hooks,
-        r.has_agents, r.has_memory,
-    ])]
-    if not active_repos:
-        return []
+    active_repos = stats.repos
 
-    headers = ["Repo", "CLAUDE.md", ".claude/", "MCP", "Skills", "Actions", "Hooks", "Agents", "Memory"]
+    headers = ["Repo", "CLAUDE.md", ".claude/", "MCP", "Skills", "Actions", "Hooks", "Agents", "Memory", "New", "Stale"]
     lines = [
         "\n<details>",
         "<summary>Per-repo breakdown</summary>",
@@ -87,6 +82,12 @@ def _render_details(stats: OrgStats, _config: Config) -> list[str]:
 
     def check(val: bool) -> str:
         return "✅" if val else ""
+
+    def new(val: bool) -> str:
+        return "🆕" if val else ""
+
+    def stale(val: bool) -> str:
+        return "⚠️" if val else ""
 
     for repo in sorted(active_repos, key=lambda r: r.name.lower()):
         row = [
@@ -99,6 +100,8 @@ def _render_details(stats: OrgStats, _config: Config) -> list[str]:
             check(repo.has_hooks),
             check(repo.has_agents),
             check(repo.has_memory),
+            new(repo.is_new),
+            stale(repo.is_stale),
         ]
         lines.append("| " + " | ".join(row) + " |")
 

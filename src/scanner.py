@@ -48,6 +48,16 @@ def scan_repo(gh: Github, repo) -> RepoFeatures:
 
     _check_rate_limit(gh)
 
+    # Check if repo is stale (no commits in 3+ months)
+    if repo.pushed_at:
+        days_since_push = (datetime.datetime.now(datetime.timezone.utc) - repo.pushed_at).days
+        features.is_stale = days_since_push > 90
+
+    # Check if repo is new (created within last 7 days)
+    if repo.created_at:
+        days_since_creation = (datetime.datetime.now(datetime.timezone.utc) - repo.created_at).days
+        features.is_new = days_since_creation < 7
+
     # Get full tree in one API call
     try:
         default_branch = repo.default_branch
